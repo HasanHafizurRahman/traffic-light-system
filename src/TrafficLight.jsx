@@ -1,25 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import './TrafficLight.css';
+import './TrafficLight.css'; // Include basic CSS for styling
 
 const TrafficLight = () => {
+  // Define initial durations for each light in seconds
   const initialDurations = {
     red: 10,
     yellow: 5,
-    green: 15
-  }
-  const [currentLight, setCurrentLight] = useState('green');
+    green: 15,
+  };
+
+  const [currentLight, setCurrentLight] = useState('red');
   const [redDuration, setRedDuration] = useState(initialDurations.red);
   const [yellowDuration, setYellowDuration] = useState(initialDurations.yellow);
   const [greenDuration, setGreenDuration] = useState(initialDurations.green);
   const [timer, setTimer] = useState(initialDurations.red);
 
+  // State to handle additional time for each light
+  const [redExtraTime, setRedExtraTime] = useState(0);
+  const [yellowExtraTime, setYellowExtraTime] = useState(0);
+  const [greenExtraTime, setGreenExtraTime] = useState(0);
+
   useEffect(() => {
     const interval = setInterval(() => {
-      // Decrease the timer every second
       setTimer((prev) => prev - 1);
     }, 1000);
 
-    // Switch lights based on the current timer value
+    // Switch lights when the timer reaches 0
     if (timer === 0) {
       switch (currentLight) {
         case 'red':
@@ -39,7 +45,6 @@ const TrafficLight = () => {
       }
     }
 
-    // Cleanup interval on component unmount
     return () => clearInterval(interval);
   }, [timer, currentLight, redDuration, yellowDuration, greenDuration]);
 
@@ -59,23 +64,28 @@ const TrafficLight = () => {
     setTimer(greenDuration);
   };
 
-  // Function to increase the timer by a user-specified value
-  const increaseTimer = (seconds) => {
-    switch (currentLight) {
-      case 'red':
-        setRedDuration(redDuration + seconds);
-        setTimer(timer + seconds);
-        break;
-      case 'yellow':
-        setYellowDuration(yellowDuration + seconds);
-        setTimer(timer + seconds);
-        break;
-      case 'green':
-        setGreenDuration(greenDuration + seconds);
-        setTimer(timer + seconds);
-        break;
-      default:
-        break;
+  // Functions to increase the timer for each light individually
+  const increaseRedTime = () => {
+    const additionalTime = Number(redExtraTime);
+    if (additionalTime > 0) {
+      setRedDuration(redDuration + additionalTime);
+      if (currentLight === 'red') setTimer(timer + additionalTime);
+    }
+  };
+
+  const increaseYellowTime = () => {
+    const additionalTime = Number(yellowExtraTime);
+    if (additionalTime > 0) {
+      setYellowDuration(yellowDuration + additionalTime);
+      if (currentLight === 'yellow') setTimer(timer + additionalTime);
+    }
+  };
+
+  const increaseGreenTime = () => {
+    const additionalTime = Number(greenExtraTime);
+    if (additionalTime > 0) {
+      setGreenDuration(greenDuration + additionalTime);
+      if (currentLight === 'green') setTimer(timer + additionalTime);
     }
   };
 
@@ -97,18 +107,36 @@ const TrafficLight = () => {
       </div>
 
       <div>
+        <h3>Increase Time for Red</h3>
         <input
           type="number"
           placeholder="Enter seconds to add"
-          id="time-input"
+          value={redExtraTime}
+          onChange={(e) => setRedExtraTime(e.target.value)}
         />
-        <button
-          onClick={() =>
-            increaseTimer(Number(document.getElementById('time-input').value))
-          }
-        >
-          Add Time
-        </button>
+        <button onClick={increaseRedTime}>Add Time to Red</button>
+      </div>
+
+      <div>
+        <h3>Increase Time for Yellow</h3>
+        <input
+          type="number"
+          placeholder="Enter seconds to add"
+          value={yellowExtraTime}
+          onChange={(e) => setYellowExtraTime(e.target.value)}
+        />
+        <button onClick={increaseYellowTime}>Add Time to Yellow</button>
+      </div>
+
+      <div>
+        <h3>Increase Time for Green</h3>
+        <input
+          type="number"
+          placeholder="Enter seconds to add"
+          value={greenExtraTime}
+          onChange={(e) => setGreenExtraTime(e.target.value)}
+        />
+        <button onClick={increaseGreenTime}>Add Time to Green</button>
       </div>
     </div>
   );
